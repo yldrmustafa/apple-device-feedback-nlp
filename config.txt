@@ -1,0 +1,42 @@
+#şimdiye kadar ilk 32 sayfa çekildi
+[
+   "https://www.sikayetvar.com/iphone/se",
+   "https://www.sikayetvar.com/iphone/11",
+   "https://www.sikayetvar.com/iphone/11-pro",
+   "https://www.sikayetvar.com/iphone/11-pro-max",
+   "https://www.sikayetvar.com/iphone/12",
+   "https://www.sikayetvar.com/iphone/12-pro",
+   "https://www.sikayetvar.com/iphone/12-pro-max",
+   "https://www.sikayetvar.com/iphone/13",
+   "https://www.sikayetvar.com/iphone/13-pro",
+   "https://www.sikayetvar.com/iphone/13-pro-max",
+   "https://www.sikayetvar.com/iphone/14",
+   "https://www.sikayetvar.com/iphone/14-plus",
+   "https://www.sikayetvar.com/iphone/14-pro",
+   "https://www.sikayetvar.com/iphone/14-pro-max",
+   "https://www.sikayetvar.com/iphone/15",
+   "https://www.sikayetvar.com/iphone/15-pro",
+   "https://www.sikayetvar.com/iphone/15-pro-max",
+   "https://www.sikayetvar.com/iphone/16",
+   "https://www.sikayetvar.com/iphone/16-plus",
+   "https://www.sikayetvar.com/iphone/16-pro",
+   "https://www.sikayetvar.com/iphone/16-pro-max",
+   "https://www.sikayetvar.com/ipad/mini",
+   "https://www.sikayetvar.com/ipad/air",
+   "https://www.sikayetvar.com/ipad/pro",
+   "https://www.sikayetvar.com/ipad/genel",
+   "https://www.sikayetvar.com/apple-watch",
+   "https://www.sikayetvar.com/macbook/pro",
+   "https://www.sikayetvar.com/macbook/air",
+   "https://www.sikayetvar.com/macbook/genel",
+   "https://www.sikayetvar.com/airpods/airpods-pro",
+   "https://www.sikayetvar.com/airpods/airpods-max",
+   "https://www.sikayetvar.com/airpods/airpods-3",
+   "https://www.sikayetvar.com/airpods/genel"
+] 
+#ilk 5 sayfa
+    "https://www.sikayetvar.com/iphone/12-mini"
+    "https://www.sikayetvar.com/iphone/x"
+    "https://www.sikayetvar.com/iphone/17"
+    "https://www.sikayetvar.com/iphone/17-pro-max",
+    "https://www.sikayetvar.com/iphone/xr"

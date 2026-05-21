@@ -1,0 +1,11 @@
+pandas
+scikit-learn
+requests
+beautifulsoup4
+sentence-transformers
+selenium
+streamlit
+transformers
+torch
+pymongo
+numpy
