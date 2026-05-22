@@ -483,11 +483,13 @@ def yorumlari_kumele(yorumlar: List[str], cihaz_adi: str | None = None) -> Dict[
     taxonomy_key, categories, category_descriptions, keyword_rules, emoji_map = _get_taxonomy(cihaz_adi)
     _compute_category_embeddings(taxonomy_key, category_descriptions)
 
+    normalized_yorumlar = [_safe_normalize(yorum) for yorum in yorumlar]
+
     categorized: dict = defaultdict(list)
 
-    print(f"     ✓ {len(yorumlar)} yorum embedding'e dönüştürülüyor...")
+    print(f"     ✓ {len(normalized_yorumlar)} yorum embedding'e dönüştürülüyor...")
     comment_embeddings = _EMBEDDER.encode(
-        yorumlar, convert_to_numpy=True, show_progress_bar=False
+        normalized_yorumlar, convert_to_numpy=True, show_progress_bar=False
     )
 
     print(f"     ✓ Kategori eşleştirmesi yapılıyor...")
@@ -500,7 +502,7 @@ def yorumlari_kumele(yorumlar: List[str], cihaz_adi: str | None = None) -> Dict[
     else:
         semantic_threshold = 0.32 if taxonomy_key == "airpods" else 0.35
 
-    for comment, cat_idx, score in zip(yorumlar, best_indices, best_scores):
+    for comment, cat_idx, score in zip(normalized_yorumlar, best_indices, best_scores):
         model_category = "Diğer" if float(score) < semantic_threshold else categories[cat_idx]
         final_category, decision_source, rule_category = _resolve_category_with_priority(
             comment,
@@ -588,7 +590,7 @@ class DatabaseCategorizer:
                 best_scores  = np.max(similarities, axis=1)
 
                 for doc, cat_idx, score in zip(batch, best_indices, best_scores):
-                    yorum_metni = doc.get('comment', '') or doc.get('normalized_comment', '') or ''
+                    yorum_metni = doc.get('normalized_comment') or _safe_normalize(doc.get('comment', ''))
                     if konu_disi_mi(yorum_metni):
                         category_name = 'Platform ve Dolandırıcılık Sorunu'
                     else:

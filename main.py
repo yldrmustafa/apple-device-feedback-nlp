@@ -2,18 +2,8 @@
 run.py
 ──────
 Apple feedback üretim ve onarım aracı (MongoDB read-only)
-
-Kullanım:
-  python run.py
-  python run.py --repair-feedback
-
-DÜZELTİLEN HATALAR:
-  - json_veri yapısında kategoriler[kat]["yorumlar"] değeri:
-    yorumlari_kumele() {"yorum":..., "skor":...} dict listesi döndürüyor,
-    ama excel_kaydet() / feedback_kaydet() string bekliyordu.
-    Artık kumeler zaten string listesi döndürüyor (yorum_kumeleme_v2.py düzeltildi),
-    ama run.py'de de savunmalı dönüşüm eklendi.
-  - islened → islenen yazım hatası düzeltildi (veri_isle içinde).
+Bu araç, MongoDB'den yorumları okuyarak cihaz tespiti, gruplama ve kategorileme yapar.
+Sonuçları JSON ve Excel formatında kaydeder ve mevcut feedback dosyalarını onarır.
 """
 
 import argparse
@@ -58,7 +48,7 @@ except Exception as e:
 
 docs = list(collection.find(
     {"comment": {"$exists": True, "$ne": ""}},
-    {"comment": 1, "_id": 1}
+    {"comment": 1, "normalized_comment": 1, "_id": 1}
 ))
 
 print(f"Toplam yorum: {len(docs)}")
@@ -76,7 +66,7 @@ belirsiz    = 0
 konu_disi   = 0
 
 for doc in docs:
-    yorum = doc.get("comment")
+    yorum = doc.get("normalized_comment") or doc.get("comment")
     if not yorum:
         continue
 
@@ -204,6 +194,6 @@ print("\n🔧 Feedback dosyaları yeniden dağıtılıyor...")
 repair_feedback_klasoru("feedback")
 print("✔ Feedback onarımı tamamlandı")
 
-# ─── 7. DASHBOARD (isteğe bağlı) ──────────────────────────
+# ─── 7.dashboard (isteğe bağlı) ──────────────────────────
 # subprocess.Popen([sys.executable, "-m", "streamlit", "run", "dashboard.py"])
 # print("✔ http://localhost:8501")

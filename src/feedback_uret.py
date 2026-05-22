@@ -178,10 +178,10 @@ def veri_isle(
 
     cleaned_rows = []
     for doc in docs:
-        yorum_metni = doc.get("comment", "").strip()
+        yorum_metni = (doc.get("normalized_comment") or doc.get("comment", "")).strip()
         if not yorum_metni:
             continue
-        processing_text = doc.get("normalized_comment") or _safe_normalize(yorum_metni)
+        processing_text = yorum_metni or _safe_normalize(doc.get("comment", ""))
         cleaned_rows.append((doc, yorum_metni, processing_text))
 
     batch_size = 100
@@ -199,7 +199,7 @@ def veri_isle(
                 belirsiz += 1
                 continue
 
-            if konu_disi_mi(yorum_metni):
+            if konu_disi_mi(processing_text):
                 konu_disi += 1
                 continue
 
@@ -218,7 +218,7 @@ def veri_isle(
 
             yorum_obj = {
                 "id":     str(doc.get("_id", "")),
-                "yorum":  yorum_metni,
+                "yorum":  processing_text,
                 "kaynak": doc.get("source", ""),
                 "tarih":  tarih_str,
                 "detect": sonuc_method,

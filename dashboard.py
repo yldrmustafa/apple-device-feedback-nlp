@@ -1,6 +1,7 @@
 import streamlit as st
 import json
 import os
+import html
 from pathlib import Path
 from collections import defaultdict
 import pandas as pd
@@ -240,7 +241,7 @@ def build_summary(devices_data: dict) -> dict:
     }
 
 
-def yorumlar_html(yorumlar: list) -> str:
+def yorumlar_html(yorumlar: list, max_chars: int | None = 300) -> str:
     """
     Yorumları TEK BİR HTML bloğu olarak döndür.
     st.write() döngüsü yerine tek st.markdown() → dramatik hız farkı.
@@ -248,10 +249,43 @@ def yorumlar_html(yorumlar: list) -> str:
     items = []
     for i, y in enumerate(yorumlar):
         text = str(y.get("yorum", y) if isinstance(y, dict) else y)
-        # 300 karakterden uzunsa kes (expander yok — hız için)
-        display = text[:300] + "…" if len(text) > 300 else text
+        if max_chars is not None and len(text) > max_chars:
+            display_text = text[:max_chars] + "…"
+        else:
+            display_text = text
+        display = html.escape(display_text)
         items.append(f'<div class="yorum-item"><b>{i+1}.</b> {display}</div>')
     return f'<div class="yorum-list">{"".join(items)}</div>'
+
+
+def yorumlar_sayfali_gosterim(yorumlar: list, key_prefix: str, page_size: int = 20) -> None:
+    toplam = len(yorumlar)
+    if toplam == 0:
+        st.caption("Yorum bulunamadı.")
+        return
+
+    sayfa_sayisi = max(1, (toplam + page_size - 1) // page_size)
+    sayfa_key = f"{key_prefix}_page"
+    if sayfa_key not in st.session_state:
+        st.session_state[sayfa_key] = 1
+
+    cols = st.columns([1, 1, 3])
+    if cols[0].button("◀ Önceki", key=f"{key_prefix}_prev", disabled=st.session_state[sayfa_key] <= 1):
+        st.session_state[sayfa_key] -= 1
+        st.rerun()
+    if cols[1].button("Sonraki ▶", key=f"{key_prefix}_next", disabled=st.session_state[sayfa_key] >= sayfa_sayisi):
+        st.session_state[sayfa_key] += 1
+        st.rerun()
+
+    page = st.session_state[sayfa_key]
+    start = (page - 1) * page_size
+    end = min(start + page_size, toplam)
+
+    cols[2].caption(f"{toplam:,} yorum · sayfa {page}/{sayfa_sayisi}")
+    st.markdown(yorumlar_html(yorumlar[start:end], max_chars=None), unsafe_allow_html=True)
+
+    if toplam > page_size:
+        st.caption("Tam metin görünümünde yorumlar sayfa sayfa yüklenir; böylece arayüz takılmadan çalışır.")
 
 
 def plotly_theme() -> dict:
@@ -476,16 +510,21 @@ def render_device_view(device_key: str):
         cnt      = data.get("sorun_sayısı", len(data.get("yorumlar", [])))
         yorumlar = data.get("yorumlar", [])
         pct      = (cnt / device_total * 100) if device_total else 0
+        safe_key = f"{device_key}_{sorun}".replace(" ", "_").replace("/", "_")
 
         with st.expander(f"{sorun}  —  {cnt} yorum  ({pct:.1f}%)", expanded=False):
             col_a, col_b = st.columns(2)
             col_a.metric("Yorum sayısı", cnt)
             col_b.metric("Oran", f"%{pct:.1f}")
 
+            full_view = st.toggle("Tam metin göster", key=f"{safe_key}_full_view")
+
             st.markdown("<br>", unsafe_allow_html=True)
 
             if not yorumlar:
                 st.caption("Yorum bulunamadı.")
+            elif full_view:
+                yorumlar_sayfali_gosterim(yorumlar, key_prefix=safe_key, page_size=20)
             else:
                 st.markdown(yorumlar_html(yorumlar), unsafe_allow_html=True)
                 if len(yorumlar) > 20:
